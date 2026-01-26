@@ -3,7 +3,6 @@ from httpx import AsyncClient
 from unittest.mock import AsyncMock, patch, MagicMock
 from app.main import app
 from motor.motor_asyncio import AsyncIOMotorClient
-from datetime import datetime
 
 
 @pytest.mark.asyncio

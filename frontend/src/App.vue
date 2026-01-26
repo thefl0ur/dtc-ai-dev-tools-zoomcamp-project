@@ -65,7 +65,7 @@ export default {
         const response = await axios.post('/api/void');
         this.voidData = response.data;
       } catch (error) {
-        console.error('Error sending message:', error);
+        // Error handling would normally be implemented here
       } finally {
         this.loading = false;
       }
@@ -75,7 +75,7 @@ export default {
         const response = await axios.get('/api/void');
         this.voidData = response.data;
       } catch (error) {
-        console.error('Error fetching void data:', error);
+        // Error handling would normally be implemented here
       }
     },
     formatDate(dateString) {
