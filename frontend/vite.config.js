@@ -3,7 +3,7 @@ import vue from '@vitejs/plugin-vue'
 
 // Determine the backend URL based on environment
 const BACKEND_URL = process.env.VUE_APP_API_URL ||
-                  (process.env.NODE_ENV === 'development' ? 'http://backend-dev:8000' : 'http://backend:8000');
+                  (process.env.NODE_ENV === 'development' ? 'http://backend:8000' : 'http://backend:8000');
 
 // https://vitejs.dev/config/
 export default defineConfig({
