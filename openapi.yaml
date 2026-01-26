@@ -1,0 +1,47 @@
+openapi: 3.0.0
+info:
+  title: "Vsacía API"
+  version: 1.0.0
+  description: "API for sending messages into the void"
+paths:
+  /void:
+    get:
+      summary: "Get current void statistics"
+      responses:
+        '200':
+          description: "Current void statistics"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: ""
+                  count:
+                    type: integer
+                    example: 0
+                  timestamp:
+                    type: string
+                    format: date-time
+                    example: "2023-01-01T00:00:00Z"
+    post:
+      summary: "Send a message into the void"
+      responses:
+        '200':
+          description: "Message sent successfully"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: ""
+                  count:
+                    type: integer
+                    example: 1
+                  timestamp:
+                    type: string
+                    format: date-time
+                    example: "2023-01-01T00:00:00Z"

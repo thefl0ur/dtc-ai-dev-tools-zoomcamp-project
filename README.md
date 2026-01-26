@@ -27,12 +27,6 @@ Contract: OpenAPI 3.0 (must match implementation exactly).
 Testing: Pytest (Backend), Vitest (Frontend), Playwright (E2E Integration).
 Ops: Docker, Docker Compose, GitHub Actions.
 
-#### Frontend
+## API Documentation
 
-#### Backend
-
-#### Infrastructure
-
-#### CI/CD
-
-### Instructions
+The API follows the OpenAPI 3.0 specification defined in [`openapi.yaml`](./openapi.yaml).
