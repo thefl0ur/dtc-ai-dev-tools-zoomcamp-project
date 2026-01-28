@@ -34,10 +34,13 @@ The project follows an AI-assisted development methodology using Qwen-code's sub
 
 ## Current Status
 
-The project is in early stage with:
-- README.md outlining the project concept and goals
-- Agent configurations set up for different development areas
-- Empty QWEN.md file (this document) to serve as comprehensive project context
+The project is complete with:
+- Full-featured web application deployed on Render
+- Backend service running on https://dtc-ai-tool-backend.onrender.com
+- Frontend service running on https://dtc-ai-tool-frontend.onrender.com
+- Proper CORS configuration implemented to allow cross-origin requests
+- Updated CI/CD pipeline with simplified deployment workflow
+- Comprehensive documentation in README.md
 
 ## Technical Stack
 
@@ -46,42 +49,36 @@ Frontend: Vue 3 (Vite) + Tailwind CSS + Axios.
 Database: MongoDB.
 Contract: OpenAPI 3.0 (must match implementation exactly).
 Testing: Pytest (Backend), Vitest (Frontend), Playwright (E2E Integration).
-Ops: Docker, Docker Compose, GitHub Actions.
+Ops: Docker, Docker Compose, GitHub Actions, Render.
 
 ## Functional Requirements
 
 Backend:
-* POST /void: Backend generates an datetime, saves it to Mongo incrementing counter, returns updated numbers of counter and update time.
-
+* POST /void: Backend generates a datetime, saves it to Mongo incrementing counter, returns updated numbers of counter and update time.
 * GET /void: Returns a JSON object: { "message": "", "count": <int>, "timestamp": <datetime>}, where count is value of counter and timestamp is its modification time.
+* CORS: Backend allows requests from frontend domain to prevent CORS errors.
 
 Frontend UI:
-
-* A "Send messate into the void" button that calls the POST route.
-
+* A "Send message into the void" button that calls the POST route.
 * A display showing the current "Count" and a last update time.
+* Direct API calls to the backend service instead of relative paths.
 
-Both apps should support configuration via envirement
+Both apps support configuration via environment variables.
 
 ## Architecture
 
 ## Testing & Quality
 Backend Unit: Tests must use httpx.AsyncClient and a mock/test database.
-
 Frontend Unit: Tests must verify the UI handles the "Empty Message" string correctly without crashing.
-
 Integration (E2E): Playwright must spin up the full environment, click the button, and verify the count increments in the UI by querying the actual backend.
 
-
 Backend code linting: ruff via uvx
-
-Frontend code linting
+Frontend code linting: ESLint
 
 CI Pipeline: Must lint the OpenAPI spec against the code, lint both backend and frontend and run all test suites before allowing a Docker build.
 
 ## Docker Orchestration
 Profiles: Provide a docker-compose.yml.
-
 Persistence: Use a named volume (mongo_data) to ensure the void history is persistent across restarts.
 
 ## Suggested layout
@@ -96,13 +93,14 @@ root/
 ├── QWEN.md
 ├── README.md
 ├── .github/workflows/ci.yml   # CI pipeline (Test -> Build)
+├── .github/workflows/manual-deploy.yml   # Manual deployment pipeline (simplified)
 ├── openapi.yaml               # The Source of Truth
 ├── docker-compose.yml         # Local orchestration (App + DB)
 ├── e2e/                       # Playwright integration tests
 │   └── void.spec.ts
 ├── backend/
 │   ├── app/
-│   │   ├── main.py            # FastAPI + Lifespan events for DB
+│   │   ├── main.py            # FastAPI + Lifespan events for DB + CORS middleware
 │   │   ├── database.py        # Motor client connection
 │   │   └── schemas.py         # Pydantic (VoidResponse, VoidCreate)
 │   ├── tests/
@@ -115,3 +113,23 @@ root/
     ├── tests/
     │   └── unit.spec.ts       # Vitest for component rendering
     └── Dockerfile             # Multi-stage Nginx build
+
+## Recent Updates
+
+### Backend Updates
+- Added CORS middleware to allow requests from frontend domain
+- Configuration allows all origins for development flexibility
+
+### Frontend Updates
+- Updated to make direct API calls to backend service instead of relative paths
+- Properly handles API responses from the backend
+
+### Deployment Updates
+- Simplified GitHub Actions workflow in manual-deploy.yml
+- Removed Docker image building from deployment process
+- Now directly calls Render deployment hooks
+- Pipeline fails properly if curl commands fail
+
+### Documentation Updates
+- Added section describing AI agents used in the project to README.md
+- Updated README with comprehensive documentation of the system
