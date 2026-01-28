@@ -2,6 +2,7 @@ import os
 from contextlib import asynccontextmanager
 from datetime import datetime
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
 from pydantic import BaseModel
 from dotenv import load_dotenv
@@ -25,6 +26,15 @@ async def lifespan(app: FastAPI):
     client.close()
 
 app = FastAPI(lifespan=lifespan)
+
+# Add CORS middleware to allow all origins
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Allow all origins
+    allow_credentials=True,
+    allow_methods=["*"],  # Allow all methods
+    allow_headers=["*"],  # Allow all headers
+)
 
 @app.get("/void", response_model=VoidResponse)
 async def get_void():
