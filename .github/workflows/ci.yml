@@ -6,6 +6,9 @@ on:
   pull_request:
     branches: [ master ]
   workflow_dispatch:  # Allows manual triggering
+    paths:
+    - "backend/**"
+    - "frontend/**"
 
 jobs:
   test:
@@ -91,15 +94,6 @@ jobs:
           type=raw,value=latest
           type=sha,prefix=
 
-    - name: Extract metadata for frontend
-      id: frontend-meta
-      uses: docker/metadata-action@v5
-      with:
-        images: ${{ vars.FRONTEND_IMAGE_NAME }}
-        tags: |
-          type=raw,value=latest
-          type=sha,prefix=
-
     - name: Build and push backend image
       uses: docker/build-push-action@v5
       with:
@@ -107,11 +101,3 @@ jobs:
         push: true
         tags: ${{ steps.backend-meta.outputs.tags }}
         labels: ${{ steps.backend-meta.outputs.labels }}
-
-    - name: Build and push frontend image
-      uses: docker/build-push-action@v5
-      with:
-        context: ./frontend
-        push: true
-        tags: ${{ steps.frontend-meta.outputs.tags }}
-        labels: ${{ steps.frontend-meta.outputs.labels }}

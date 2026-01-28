@@ -58,16 +58,6 @@ jobs:
             type=sha,prefix=
             type=raw,value=${{ inputs.custom_tag }}
 
-      - name: Extract metadata for frontend
-        id: frontend-meta
-        uses: docker/metadata-action@v5
-        if: ${{ inputs.deploy_frontend == true }}
-        with:
-          images: ${{ vars.FRONTEND_IMAGE_NAME }}
-          tags: |
-            type=raw,value=latest
-            type=sha,prefix=
-            type=raw,value=${{ inputs.custom_tag }}
 
       - name: Build and push backend
         uses: docker/build-push-action@v5
@@ -78,14 +68,6 @@ jobs:
           tags: ${{ steps.backend-meta.outputs.tags }}
           labels: ${{ steps.backend-meta.outputs.labels }}
 
-      - name: Build and push frontend
-        uses: docker/build-push-action@v5
-        if: ${{ inputs.deploy_frontend == true }}
-        with:
-          context: ./frontend
-          push: true
-          tags: ${{ steps.frontend-meta.outputs.tags }}
-          labels: ${{ steps.frontend-meta.outputs.labels }}
 
       - name: Deploy to Render - Backend
         if: ${{ inputs.deploy_backend == true }}
@@ -93,7 +75,7 @@ jobs:
           curl -X POST ${{ secrets.RENDER_DEPLOY_BACKEND_HOOK }}
         continue-on-error: true
 
-      - name: Deploy to Render - Frontend
+      - name: Trigger frontend deployment to Render
         if: ${{ inputs.deploy_frontend == true }}
         run: |
           curl -X POST ${{ secrets.RENDER_DEPLOY_FRONTEND_HOOK }}
@@ -103,5 +85,5 @@ jobs:
         run: |
           echo "Production deployment completed!"
           echo "Backend deployed: ${{ inputs.deploy_backend }}"
-          echo "Frontend deployed: ${{ inputs.deploy_frontend }}"
+          echo "Frontend deployment triggered: ${{ inputs.deploy_frontend }}"
           echo "Custom tag used: ${{ inputs.custom_tag }}"

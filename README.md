@@ -16,18 +16,15 @@ We will try to respect all [criteria](https://github.com/DataTalksClub/ai-dev-to
 
 For implementation I used [QWEN-code](https://github.com/QwenLM/qwen-code) and its specialized agents, specifically using [subagents](https://qwenlm.github.io/qwen-code-docs/en/users/features/sub-agents/) for specific tasks like frontend and backend development. The project was built using AI-assisted development workflows, with detailed prompts and guidance documented in [QWEN.md](./QWEN.md) to ensure systematic implementation of all components.
 
-Also, I configured Github MCP server, but later found out it was unusable - agents don't have access to workflows and action logs, so it does not help with debugging.
+Also, I configured:
+* Github MCP server, but later found out it was unusable - agents don't have access to workflows and action logs, so it does not help with debugging.
+* Render MCP server to help my with deploying processes.
 
 File [QWEN.md](./QWEN.md) contains initial targets for agents, describing what and how I want to achieve. Later I fix, correct and implement using sending prompts into agents.
 
-In the end, the only thing I wrote by hand is [this](#).
-Backend was successfully deployed on Render at [https://dtc-ai-tool-backend.onrender.com](https://dtc-ai-tool-backend.onrender.com).
-While the frontend deployment faced challenges with Docker image creation on Render.com (resulting in 502-405-508 errors), the application can be run locally and connected to the deployed backend.
-The CI/CD pipeline is fully operational and ready to deploy both frontend and backend when properly configured.
-If you want to connect a local frontend to the deployed backend with cloud instance of MongoDB, use [this link](https://dtc-ai-tool-backend.onrender.com) as the backend API URL environment variable.
-I will keep the backend app active during the review period.
+In the end, the only thing I wrote by hand is [this](#) file.
 
-In general, I don't like that _vibe_ experiment - it was slow and nerve-wracking. and can't even deploy such simple app.
+In general, I don't like that _vibe_ experiment - it was slow and nerve-wracking.
 
 ## Problem Description
 
@@ -53,7 +50,14 @@ This simple functionality demonstrates a complete web application stack with pro
 
   **Frontend Implementation**
 
-  The frontend is built with Vue 3 and follows a well-structured component-based architecture. All backend communication is centralized through the Axios HTTP client, ensuring clean separation of concerns. The application includes comprehensive unit tests using Vitest that verify core functionality, with clear instructions on how to run them.
+  The frontend is built with Vue 3 and follows a well-structured component-based architecture. Backend communication is handled through direct axios calls in the App component. The application includes comprehensive unit tests using Vitest that verify core functionality, with clear instructions on how to run them.
+
+  **Key Features:**
+  - Component-based architecture
+  - Direct API communication using axios
+  - Environment-specific configuration for development and production
+  - Comprehensive unit testing with Vitest
+  - Responsive UI with Tailwind CSS
 
   **Backend**
    - Python 3.12: Programming language for server-side logic
@@ -110,16 +114,25 @@ This simple functionality demonstrates a complete web application stack with pro
   environments across development, testing, and production. Docker Compose orchestrates the
   multi-container setup, including the applications and the MongoDB database.
 
+  The frontend Docker configuration uses a multi-stage build process:
+  - Build stage: Compiles the Vue.js application with environment variables baked in
+  - Production stage: Serves the built static files via nginx, with API requests proxied to the backend service
+
+  This setup mirrors the production deployment on Render, where the frontend is built into static files
+  and served by a web server with API proxying configured.
+
   **CI/CD Pipeline**
   GitHub Actions automates the entire development lifecycle:
    1. Code changes trigger automated testing (both backend and frontend)
    2. Code quality checks are performed using Ruff and ESLint
    3. OpenAPI specification validation ensures API compliance
-   4. Successful tests trigger Docker image builds
-   5. Validated images are pushed to DockerHub
+   4. Successful tests trigger Docker image builds (backend only)
+   5. Validated backend images are pushed to DockerHub
    6. Deployment to production environments is handled through deployment hooks
 
   The CI/CD pipeline ensures that all tests pass before deploying the application, providing continuous integration and deployment capabilities.
+
+  Note: The frontend is deployed as a static site on Render and does not require Docker image building. The deployment is triggered via webhook to Render.
 
   This architecture promotes scalability, maintainability, and separation of concerns, with each
   technology chosen for its specific strengths in the overall system.
@@ -138,14 +151,49 @@ The OpenAPI specification serves as the contract between the frontend and backen
    cd dtc-ai-dev-tools-zoomcamp-project
    ```
 
-2. For development, start the services with hot reloading:
+2. For local development and testing, start the services:
    ```bash
    docker-compose up --build
    ```
-3. During development, the services will be available at:
-   - Frontend: `http://localhost:3001` (served via Vite dev server)
+3. The services will be available at:
+   - Frontend: `http://localhost:3001` (production build served via nginx)
    - Backend API: `http://localhost:8001`
    - MongoDB: `http://localhost:27017`
+
+4. The Docker setup uses a multi-stage approach:
+   - Build stage: Compiles the Vue.js application with environment variables
+   - Production stage: Serves the built application via nginx with API proxying to the backend
+
+## Frontend Development
+
+The frontend is built with Vue 3, Vite, and Tailwind CSS. Key features include:
+
+- **Component Architecture**: The main application logic resides in `frontend/src/App.vue`
+- **Service Layer**: API communication is handled by `frontend/src/services/voidService.js`
+- **Environment Configuration**: Different configurations for development and production environments
+- **Error Handling**: Comprehensive error handling for API calls and network issues
+- **Testing**: Unit tests using Vitest and component testing with Vue Test Utils
+
+### Frontend Commands
+
+From the `frontend/` directory:
+
+```bash
+# Install dependencies
+npm install
+
+# Start development server
+npm run dev
+
+# Build for production
+npm run build
+
+# Run unit tests
+npm run test:run
+
+# Lint code
+npm run lint
+```
 
 ## Tests
 
@@ -200,6 +248,8 @@ The integration tests cover key workflows including:
 - Count increment verification
 - Database persistence validation
 
+Note: The application now uses a production-like build in the Docker setup, where the frontend is built into static files and served via nginx with API requests proxied to the backend service.
+
 ## CI/CD Pipeline
 
 CI Pipeline
@@ -239,13 +289,28 @@ CI Pipeline
    - Optional custom Docker image tag
 
   Deployment Process
-   - Builds and pushes Docker images to DockerHub (conditionally based on user input)
+   - Builds and pushes Docker images to DockerHub (for backend only, conditionally based on user input)
    - Makes HTTP POST requests to Render deployment hooks (for both backend and frontend, conditionally)
    - Provides a summary of the deployment actions taken
 
   Both pipelines use Docker for containerization and require credentials stored as GitHub Secrets for
   DockerHub login and Render deployment hooks. The CI pipeline ensures code quality before allowing
   builds, while the manual deployment pipeline gives fine-grained control over production deployments.
+
+## Frontend Deployment
+
+The frontend is configured for deployment as a static site on Render. The deployment configuration is defined in `render.yaml`:
+
+- The build process installs dependencies and runs `npm run build`
+- The output is published from the `dist` directory
+- A rewrite rule is configured to handle client-side routing
+- Environment variables can be configured as needed
+
+To deploy manually:
+1. Connect your GitHub/GitLab repository to Render
+2. Select the `render.yaml` file for configuration
+3. Set any required environment variables
+4. Deploy the service.
 
 ## Reproducibility
 
