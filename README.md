@@ -12,19 +12,8 @@ Because of that idea is simple and brilliant - build a professional, containeriz
 
 _Why not?_
 
-We will try to respect all [criteria](https://github.com/DataTalksClub/ai-dev-tools-zoomcamp/tree/main/project#criteria)!
-
-For implementation I used [QWEN-code](https://github.com/QwenLM/qwen-code) and its specialized agents, specifically using [subagents](https://qwenlm.github.io/qwen-code-docs/en/users/features/sub-agents/) for specific tasks like frontend and backend development. The project was built using AI-assisted development workflows, with detailed prompts and guidance documented in [QWEN.md](./QWEN.md) to ensure systematic implementation of all components.
-
-Also, I configured:
-* Github MCP server, but later found out it was unusable - agents don't have access to workflows and action logs, so it does not help with debugging.
-* Render MCP server to help my with deploying processes.
-
-File [QWEN.md](./QWEN.md) contains initial targets for agents, describing what and how I want to achieve. Later I fix, correct and implement using sending prompts into agents.
-
-In the end, the only thing I wrote by hand is [this](#) file.
-
-In general, I don't like that _vibe_ experiment - it was slow and nerve-wracking.
+[LIVE](https://dtc-ai-tool-frontend.onrender.com/)
+ > Please remeber, that free plan on Render makes app sleep on inactivity, so initial access will be slow - first it should wake up frontend, and first request from frontend starts to wake up backend. Only DB is good to go.
 
 ## Problem Description
 
@@ -38,7 +27,51 @@ The system consists of:
 
 This simple functionality demonstrates a complete web application stack with proper separation of concerns between frontend, backend, and database layers.
 
-### Used technologies
+
+## AI system development 
+
+For implementation I used [QWEN-code](https://github.com/QwenLM/qwen-code) and its specialized agents, specifically using [subagents](https://qwenlm.github.io/qwen-code-docs/en/users/features/sub-agents/) for specific tasks like frontend and backend development.
+
+The project was built using AI-assisted development workflows, with detailed prompts and guidance documented in [QWEN.md](./QWEN.md) to ensure systematic implementation of all components.
+
+Also, I configured:
+* Github MCP server, but later found out it was unusable - agents don't have access to workflows and action logs, so it does not help with debugging.
+* Render MCP server to help my with deploying processes.
+
+File [QWEN.md](./QWEN.md) contains initial targets for agents, describing what and how I want to achieve. Later I fix, correct and implement using sending prompts into agents.
+
+In the end, the only thing I wrote by hand is [this](#) file.
+
+In general, I don't like that _vibe_ experiment - it was slow and nerve-wracking. AI will lie and fake A LOT. And deploying process is a hell for it.
+
+### AI Agents Used
+
+This project utilized several specialized AI agents to assist with different aspects of development:
+
+**Frontend Expert Agent**
+- Specializes in frontend applications with focus on reliable, clean, and testable code
+- Expertise in creating maintainable UI components and modern frontend architecture patterns
+- Implements proper testing strategies and follows best practices for frontend development
+
+**Python Backend Developer Agent**
+- Focuses on Python backend development with database interactions
+- Emphasizes clean, testable, and reliable code solutions
+- Follows Python best practices, PEP 8 standards, and proper error handling
+
+**Project Planner Agent**
+- Helps plan projects and break down complex work into manageable tasks
+- Creates structured plans with clear, actionable tasks
+- Identifies risks, dependencies, and success criteria
+
+**DevOps Engineer Agent**
+- Manages infrastructure, CI/CD pipelines, and deployment processes
+- Implements Infrastructure as Code and security best practices
+- Focuses on system reliability, scalability, and automation
+
+These agents were used throughout the development process to implement various components of the application, from initial setup to deployment.
+
+
+## Used technologies
 
  **Frontend**
    - Vue 3: Progressive JavaScript framework for building the user interface
@@ -132,11 +165,6 @@ This simple functionality demonstrates a complete web application stack with pro
 
   The CI/CD pipeline ensures that all tests pass before deploying the application, providing continuous integration and deployment capabilities.
 
-  Note: The frontend is deployed as a static site on Render and does not require Docker image building. The deployment is triggered via webhook to Render.
-
-  This architecture promotes scalability, maintainability, and separation of concerns, with each
-  technology chosen for its specific strengths in the overall system.
-
 ## API Documentation
 
 The API follows the OpenAPI 3.0 specification defined in [`openapi.yaml`](./openapi.yaml).
@@ -163,37 +191,6 @@ The OpenAPI specification serves as the contract between the frontend and backen
 4. The Docker setup uses a multi-stage approach:
    - Build stage: Compiles the Vue.js application with environment variables
    - Production stage: Serves the built application via nginx with API proxying to the backend
-
-## Frontend Development
-
-The frontend is built with Vue 3, Vite, and Tailwind CSS. Key features include:
-
-- **Component Architecture**: The main application logic resides in `frontend/src/App.vue`
-- **Service Layer**: API communication is handled by `frontend/src/services/voidService.js`
-- **Environment Configuration**: Different configurations for development and production environments
-- **Error Handling**: Comprehensive error handling for API calls and network issues
-- **Testing**: Unit tests using Vitest and component testing with Vue Test Utils
-
-### Frontend Commands
-
-From the `frontend/` directory:
-
-```bash
-# Install dependencies
-npm install
-
-# Start development server
-npm run dev
-
-# Build for production
-npm run build
-
-# Run unit tests
-npm run test:run
-
-# Lint code
-npm run lint
-```
 
 ## Tests
 
@@ -257,7 +254,7 @@ CI Pipeline
   This pipeline runs automatically on:
    - Pushes to the master branch
    - Pull requests to the master branch
-   - Manual triggers (workflow_dispatch)
+   - Manual triggers
 
   The pipeline has two main jobs:
 
@@ -285,41 +282,11 @@ CI Pipeline
   Deployment Options
    - Option to deploy backend service (boolean)
    - Option to deploy frontend service (boolean)
-   - Input for backend API URL that frontend will connect to
-   - Optional custom Docker image tag
 
   Deployment Process
-   - Builds and pushes Docker images to DockerHub (for backend only, conditionally based on user input)
    - Makes HTTP POST requests to Render deployment hooks (for both backend and frontend, conditionally)
-   - Provides a summary of the deployment actions taken
 
-  Both pipelines use Docker for containerization and require credentials stored as GitHub Secrets for
+  Pipelines use Docker for containerization and require credentials stored as GitHub Secrets for
   DockerHub login and Render deployment hooks. The CI pipeline ensures code quality before allowing
   builds, while the manual deployment pipeline gives fine-grained control over production deployments.
 
-## Frontend Deployment
-
-The frontend is configured for deployment as a static site on Render. The deployment configuration is defined in `render.yaml`:
-
-- The build process installs dependencies and runs `npm run build`
-- The output is published from the `dist` directory
-- A rewrite rule is configured to handle client-side routing
-- Environment variables can be configured as needed
-
-To deploy manually:
-1. Connect your GitHub/GitLab repository to Render
-2. Select the `render.yaml` file for configuration
-3. Set any required environment variables
-4. Deploy the service.
-
-## Reproducibility
-
-The project provides complete instructions for setting up, running, testing, and deploying the system end-to-end:
-
-1. **Setup**: Complete instructions for cloning and building the project
-2. **Development**: Docker Compose configuration for local development with hot reloading
-3. **Testing**: Separate instructions for running backend, frontend, and E2E tests
-4. **Deployment**: CI/CD pipeline that automates testing, building, and deployment
-5. **Documentation**: Comprehensive README covering all aspects of the system
-
-All components are containerized with Docker, ensuring consistent environments across development, testing, and production.
