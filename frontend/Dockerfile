@@ -1,3 +1,16 @@
+# Build stage
+FROM node:18-alpine AS build
+
+WORKDIR /app
+COPY package*.json ./
+RUN npm install
+
+# Copy all files and build with environment variables
+COPY . .
+ARG VUE_APP_API_URL
+ENV VUE_APP_API_URL=$VUE_APP_API_URL
+RUN npm run build
+
 # Development stage
 FROM node:18-alpine AS development
 WORKDIR /app
@@ -6,16 +19,6 @@ RUN npm install
 COPY . .
 EXPOSE 3000
 CMD ["npm", "run", "dev"]
-
-# Build stage
-FROM node:18-alpine AS build
-
-WORKDIR /app
-COPY package*.json ./
-RUN npm install
-
-COPY . .
-RUN npm run build
 
 # Production stage
 FROM nginx:alpine AS production

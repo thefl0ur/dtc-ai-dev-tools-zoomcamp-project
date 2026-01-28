@@ -1,22 +1,19 @@
 version: '3.8'
 
 services:
-  # Development services with hot reloading
+  # Production-like frontend service
   frontend:
     build:
       context: ./frontend
-      target: development  # Use development stage if multi-stage
+      target: production  # Use production stage
+      args:
+        - VUE_APP_API_URL=http://backend:8000  # Build-time environment variable
     ports:
-      - "3001:3000"  # Vite default port (mapped to 3001 to avoid conflicts)
-    volumes:
-      - ./frontend:/app
-      - /app/node_modules  # Don't mount node_modules to avoid conflicts
-    working_dir: /app
-    command: npm run dev
+      - "3001:80"  # Expose on port 80 (standard HTTP)
     depends_on:
       - backend
     environment:
-      - VUE_APP_API_URL=http://backend:8000
+      - VUE_APP_API_URL=http://backend:8000  # Runtime environment variable for nginx
     networks:
       - vsacia-network
 
@@ -28,9 +25,7 @@ services:
       - MONGODB_URL=mongodb://mongo:27017/vsacia
     depends_on:
       - mongo
-    volumes:
-      - ./backend:/app
-    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload  # Enable auto-reload
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000  # Disable reload for production
     networks:
       - vsacia-network
 
