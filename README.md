@@ -162,6 +162,8 @@ npm run test:run
 Run backend tests with pytest:
 ```bash
 cd backend
+python -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
 pip install -r requirements.txt
 python -m pytest tests/
 ```
@@ -171,19 +173,24 @@ python -m pytest tests/
 Run Playwright E2E tests:
 
 #### Prerequisites
-Before running the E2E tests, you need to install the project dependencies:
+Before running the E2E tests, ensure all project dependencies are installed:
 
 ```bash
 # In the project root directory
-npx playwright install --with-deps
+npm install
 ```
 
 #### Running the Tests
 
-The E2E tests require all services to be running, as it validates the complete application workflow including database interactions:
+The E2E tests validate the complete application workflow including database interactions. First, start all services:
 
 ```bash
 docker-compose up -d
+```
+
+Then run the tests:
+
+```bash
 npx playwright test e2e/void.spec.js
 ```
 

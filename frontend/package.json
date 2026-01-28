@@ -22,6 +22,7 @@
     "vue": "^3.3.8"
   },
   "devDependencies": {
+    "@playwright/test": "^1.58.0",
     "@rushstack/eslint-patch": "^1.5.1",
     "@vitejs/plugin-vue": "^4.4.0",
     "@vitest/ui": "^0.34.6",
@@ -29,7 +30,6 @@
     "eslint": "^8.53.0",
     "eslint-plugin-vue": "^9.18.1",
     "jsdom": "^22.1.0",
-    "@playwright/test": "^1.40.0",
     "playwright": "^1.40.0"
   }
 }
