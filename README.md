@@ -13,7 +13,16 @@ Because of that idea is simple and brilliant - build a professional, containeriz
 _Why not?_
 
 [LIVE](https://dtc-ai-tool-frontend.onrender.com/)
- > Please remeber, that free plan on Render makes app sleep on inactivity, so initial access will be slow - first it should wake up frontend, and first request from frontend starts to wake up backend. Only DB is good to go.
+
+ > Please remeber, that free plan on Render makes app to sleep on inactivity, so initial access will be slow - first it should wake up backend. DB is good to go.
+
+
+<details>
+  <summary>Wake up instruction</summary> 
+
+  [Click here](https://dtc-ai-tool-backend.onrender.com/) to wake up backend manually.
+
+</details>
 
 ## Problem Description
 
